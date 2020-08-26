@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'iOSDropDown'
-  s.version          = '0.3.4'
+  s.version          = '1.0.0'
   s.summary          = ' iOSDropDown is an Awesome DropDown Library with Search and other customization options'
   s.swift_version      = '5.0'
   s.description      = <<-DESC
@@ -25,13 +25,13 @@ iOSDropDown is an Awesome Drop Down Menu Library with Search & other customizati
    s.ios.deployment_target = '8.0'
 
    s.source_files = 'iOSDropDown/Classes/**/*'
-  
+
   # s.resource_bundles = {
   #   'iOSDropDown' => ['iOSDropDown/Assets/*.png']
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
    s.frameworks = 'UIKit'
-  
-  
+
+
 end
