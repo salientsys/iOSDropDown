@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'UIDropdownMenu'
-  s.version          = '1.0.0'
+  s.version          = '1.1.0'
   s.summary          = ' UIDropdownMenu is an awesome dropdown library with search and other customization options'
   s.swift_version      = '5.0'
   s.description      = <<-DESC

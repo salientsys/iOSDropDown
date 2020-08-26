@@ -1,5 +1,5 @@
 PODS:
-  - UIDropdownMenu (1.0.0)
+  - UIDropdownMenu (1.1.0)
 
 DEPENDENCIES:
   - UIDropdownMenu (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  UIDropdownMenu: 068ad5da5c0d7a3fb5142e1deebf549706cf69c7
+  UIDropdownMenu: 61e7bd60fb5f63e4324b451ee0844708abb94656
 
 PODFILE CHECKSUM: f3b7bdc17a22f717faaea589dbaeeb1f079a18c0
 
