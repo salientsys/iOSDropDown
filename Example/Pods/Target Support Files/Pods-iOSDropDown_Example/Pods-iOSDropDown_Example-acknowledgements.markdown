@@ -1,7 +1,7 @@
 # Acknowledgements
 This application makes use of the following third party libraries:
 
-## iOSDropDown
+## UIDropdownMenu
 
 Copyright (c) 2018 Jishnu Raj <jriosdev@gmail.com>
 

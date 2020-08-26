@@ -1,0 +1,6 @@
+framework module UIDropdownMenu {
+  umbrella header "UIDropdownMenu-umbrella.h"
+
+  export *
+  module * { export * }
+}
