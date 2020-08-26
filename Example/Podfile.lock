@@ -1,16 +1,16 @@
 PODS:
-  - iOSDropDown (0.3.4)
+  - UIDropdownMenu (0.3.4)
 
 DEPENDENCIES:
-  - iOSDropDown (from `../`)
+  - UIDropdownMenu (from `../`)
 
 EXTERNAL SOURCES:
-  iOSDropDown:
+  UIDropdownMenu:
     :path: "../"
 
 SPEC CHECKSUMS:
-  iOSDropDown: e43352ed40f3a7551fe23e14d9fe6cf9bb00c1ff
+  UIDropdownMenu: 1e4d4eec534bf38a14066e2c52353b2a74005a0c
 
-PODFILE CHECKSUM: 54cfe575c445c2b89e3257b1659dc330cf88d985
+PODFILE CHECKSUM: f3b7bdc17a22f717faaea589dbaeeb1f079a18c0
 
 COCOAPODS: 1.9.3

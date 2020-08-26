@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import iOSDropDown
+import UIDropdownMenu
 
 class ViewController1: UIViewController {
     @IBOutlet var customData: [DropDown]!

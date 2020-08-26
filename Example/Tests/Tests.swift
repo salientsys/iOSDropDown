@@ -1,5 +1,5 @@
 import XCTest
-import iOSDropDown
+import UIDropdownMenu
 
 class Tests: XCTestCase {
     
