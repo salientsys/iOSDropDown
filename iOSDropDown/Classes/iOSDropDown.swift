@@ -402,7 +402,7 @@ extension DropDown: UITableViewDataSource {
         cell?.textLabel?.font = self.font
         cell?.textLabel?.textAlignment = self.textAlignment
         cell?.textLabel?.numberOfLines = 0
-        cell?.textLabel?.lineBreakMode = .byWrodWrapping
+        cell?.textLabel?.lineBreakMode = .byWordWrapping
         return cell!
     }
 }
