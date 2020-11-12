@@ -13,7 +13,7 @@ open class DropDown : UITextField{
     var arrow : Arrow!
     var table : UITableView!
     var shadow : UIView!
-    public  var selectedIndex: Int?
+    public var selectedItem: DropdownMenuItem?
 
 
     //MARK: IBInspectable
@@ -27,6 +27,7 @@ open class DropDown : UITextField{
             addGesture()
         }
     }
+    @IBInspectable public var rowDisabledBackgroundColor: UIColor = .lightGray
 
 
     @IBInspectable public var borderColor: UIColor =  UIColor.lightGray {
@@ -54,7 +55,6 @@ open class DropDown : UITextField{
     //Variables
     fileprivate  var tableheightX: CGFloat = 100
     fileprivate  var dataArray = [String]()
-    fileprivate  var imageArray = [String]()
     fileprivate  var parentController:UIViewController?
     fileprivate  var pointToParent = CGPoint(x: 0, y: 0)
     fileprivate var backgroundView = UIView()
@@ -65,12 +65,7 @@ open class DropDown : UITextField{
             self.dataArray = self.optionArray
         }
     }
-    public var optionImageArray = [String]() {
-        didSet{
-            self.imageArray = self.optionImageArray
-        }
-    }
-    public var optionIds : [Int]?
+    public var items: [DropdownMenuItem] = []
     var searchText = String() {
         didSet{
             if searchText == "" {
@@ -81,7 +76,7 @@ open class DropDown : UITextField{
                 }
             }
             reSizeTable()
-            selectedIndex = nil
+            selectedItem = nil
             self.table.reloadData()
         }
     }
@@ -122,7 +117,7 @@ open class DropDown : UITextField{
 
 
     //MARK: Closures
-    fileprivate var didSelectCompletion: (String, Int ,Int) -> () = {selectedText, index , id  in }
+    fileprivate var itemSelectionHandler: DropdownItemSelectionHandler?
     fileprivate var TableWillAppearCompletion: () -> () = { }
     fileprivate var TableDidAppearCompletion: () -> () = { }
     fileprivate var TableWillDisappearCompletion: () -> () = { }
@@ -143,10 +138,10 @@ open class DropDown : UITextField{
         self.backgroundView.backgroundColor = .clear
         addGesture()
         if isSearchEnable && handleKeyboard{
-            NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillShow, object: nil, queue: nil) { (notification) in
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil) { (notification) in
                 if self.isFirstResponder{
                 let userInfo:NSDictionary = notification.userInfo! as NSDictionary
-                    let keyboardFrame:NSValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
+                    let keyboardFrame:NSValue = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
                 let keyboardRectangle = keyboardFrame.cgRectValue
                 self.keyboardHeight = keyboardRectangle.height
                     if !self.isSelected{
@@ -155,7 +150,7 @@ open class DropDown : UITextField{
                 }
               
             }
-            NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillHide, object: nil, queue: nil) { (notification) in
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil) { (notification) in
                 if self.isFirstResponder{
                 self.keyboardHeight = 0
                 }
@@ -318,8 +313,8 @@ open class DropDown : UITextField{
     }
 
     //MARK: Actions Methods
-    public func didSelect(completion: @escaping (_ selectedText: String, _ index: Int , _ id:Int ) -> ()) {
-        didSelectCompletion = completion
+    public func didSelect(handler: @escaping (_ item: DropdownMenuItem) -> ()) {
+        itemSelectionHandler = handler
     }
 
     public func listWillAppear(completion: @escaping () -> ()) {
@@ -387,28 +382,45 @@ extension DropDown: UITableViewDataSource {
             cell = UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         }
 
-        if indexPath.row != selectedIndex{
-            cell!.backgroundColor = rowBackgroundColor
-        }else {
+        let item = items[indexPath.row]
+        let itemSelected: Bool = item.id == selectedItem?.id
+        if itemSelected {
             cell?.backgroundColor = selectedRowColor
+        } else {
+            cell?.backgroundColor = rowBackgroundColor
         }
 
-        if self.imageArray.count > indexPath.row {
-            cell!.imageView!.image = UIImage(named: imageArray[indexPath.row])
+        if item.isDisabled {
+            cell?.backgroundColor = rowDisabledBackgroundColor
+        }
+
+        if let icon = item.icon {
+            let imageView = UIImageView(image: icon)
+            imageView.tintColor = .white
+            cell?.accessoryView = imageView
         }
         cell!.textLabel!.text = "\(dataArray[indexPath.row])"
-        cell!.accessoryType = (indexPath.row == selectedIndex) && checkMarkEnabled  ? .checkmark : .none
+        cell!.accessoryType = itemSelected && checkMarkEnabled  ? .checkmark : .none
         cell!.selectionStyle = .none
         cell?.textLabel?.font = self.font
         cell?.textLabel?.textAlignment = self.textAlignment
+        cell?.textLabel?.numberOfLines = 0
+        cell?.textLabel?.lineBreakMode = .byWordWrapping
         return cell!
     }
 }
 //MARK: UITableViewDelegate
 extension DropDown: UITableViewDelegate {
+    public func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        let item = items[indexPath.row]
+
+        return item.isDisabled ? nil : indexPath
+    }
+
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedIndex = (indexPath as NSIndexPath).row
-        let selectedText = self.dataArray[self.selectedIndex!]
+        selectedItem = items[indexPath.row]
+        let selectedTitle = selectedItem!.displayName
+
         tableView.cellForRow(at: indexPath)?.alpha = 0
         UIView.animate(withDuration: 0.5,
                        animations: { () -> Void in
@@ -416,7 +428,7 @@ extension DropDown: UITableViewDelegate {
                         tableView.cellForRow(at: indexPath)?.backgroundColor = self.selectedRowColor
         } ,
                        completion: { (didFinish) -> Void in
-                        self.text = "\(selectedText)"
+                        self.text = "\(selectedTitle)"
 
                         tableView.reloadData()
         })
@@ -424,22 +436,10 @@ extension DropDown: UITableViewDelegate {
             touchAction()
             self.endEditing(true)
         }
-        if let selected = optionArray.firstIndex(where: {$0 == selectedText}) {
-            if let id = optionIds?[selected] {
-                didSelectCompletion(selectedText, selected , id )
-            }else{
-                didSelectCompletion(selectedText, selected , 0)
-            }
 
-        }
-
+        itemSelectionHandler?(selectedItem!)
     }
 }
-
-
-
-
-
 
 //MARK: Arrow
 enum Position {
@@ -528,7 +528,16 @@ extension UIView {
         layer.shouldRasterize = true
         layer.rasterizationScale = scale ? UIScreen.main.scale : 1
     }
-
+    
+    func viewBorder(borderColor : UIColor, borderWidth : CGFloat?) {
+        self.layer.borderColor = borderColor.cgColor
+        if let borderWidth_ = borderWidth {
+            self.layer.borderWidth = borderWidth_
+        } else {
+            self.layer.borderWidth = 1.0
+        }
+    }
+    
     var parentViewController: UIViewController? {
         var parentResponder: UIResponder? = self
         while parentResponder != nil {
@@ -541,3 +550,11 @@ extension UIView {
     }
 }
 
+public protocol DropdownMenuItem {
+    var id: String { get }
+    var displayName: String { get }
+    var icon: UIImage? { get }
+    var isDisabled: Bool { get }
+}
+
+typealias DropdownItemSelectionHandler = (_ item: DropdownMenuItem) -> Void
