@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'iOSDropDown'
-  s.version          = '1.2.0'
+  s.version          = '1.2.2'
   s.summary          = ' iOSDropDown is an Awesome DropDown Library with Search and other customization options'
   s.swift_version      = '5.0'
   s.description      = <<-DESC
